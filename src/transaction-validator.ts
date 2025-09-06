@@ -19,9 +19,23 @@ export class TransactionValidator {
   validateTransaction(transaction: Transaction): ValidationResult {
     const errors: ValidationError[] = [];
 
-    // STUDENT ASSIGNMENT: Implement the validation logic above
-    // Remove this line and implement the actual validation
-    throw new Error('Transaction validation not implemented - this is your assignment!');
+    // Verificación de Existencia de UTXO
+    // Verificar que todas las entradas de transacción referencien UTXOs existentes y no gastados
+    for (const input of transaction.inputs){
+      const utxo = this.utxoPool.getUTXO(input.utxoId.txId, input.utxoId.outputIndex);
+      if (!utxo) {
+        errors.push(createValidationError(
+          VALIDATION_ERRORS.UTXO_NOT_FOUND,
+          `UTXO not found: ${input.utxoId.txId}:${input.utxoId.outputIndex}`
+        ));
+      }
+    }
+
+      
+
+
+    // Verificación de Balance
+
 
     return {
       valid: errors.length === 0,
