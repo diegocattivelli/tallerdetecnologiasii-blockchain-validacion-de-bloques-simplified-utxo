@@ -68,6 +68,22 @@ export class TransactionValidator {
       }
     }
     
+    // Prevención de Doble Gasto
+    // Asegurar que ningún UTXO sea referenciado múltiples veces dentro de la misma transacción
+    const referencedUTXOs: string[] = [];
+    for (const input of transaction.inputs) {
+      const utxoKey = `${input.utxoId.txId}:${input.utxoId.outputIndex}`;
+      if (referencedUTXOs.includes(utxoKey)) {
+        errors.push(createValidationError(
+          VALIDATION_ERRORS.DOUBLE_SPENDING,
+          `UTXO referenced multiple times in transaction: ${utxoKey}`
+        ));
+      } else {
+        referencedUTXOs.push(utxoKey);
+      }
+    }
+
+    
     return {
       valid: errors.length === 0,
       errors
