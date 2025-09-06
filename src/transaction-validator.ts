@@ -31,12 +31,28 @@ export class TransactionValidator {
       }
     }
 
-      
-
-
     // Verificación de Balance
+    // Asegurar que la suma de montos de entrada igualen la suma de montos de salida
 
+    let totalInput = 0;
+    for (const input of transaction.inputs) {
+      const utxo = this.utxoPool.getUTXO(input.utxoId.txId, input.utxoId.outputIndex);
+      if (utxo) totalInput += utxo.amount;
+    }
 
+    let totalOutput = 0;
+    for (const output of transaction.outputs) {
+      totalOutput += output.amount;
+    }
+
+    if (totalInput !== totalOutput) {
+      errors.push(createValidationError(
+        VALIDATION_ERRORS.AMOUNT_MISMATCH,
+        `Input amount (${totalInput}) does not match output amount (${totalOutput})`
+      ));
+    }
+
+    
     return {
       valid: errors.length === 0,
       errors
