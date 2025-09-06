@@ -58,7 +58,7 @@ export class TransactionValidator {
     for (const input of transaction.inputs) {
       const utxo = this.utxoPool.getUTXO(input.utxoId.txId, input.utxoId.outputIndex);
       if (utxo) {
-        const isValid = verify(dataToSign, input.signature, input.owner);
+        const isValid = verify(dataToSign, input.signature, utxo.recipient);
         if (!isValid) {
           errors.push(createValidationError(
             VALIDATION_ERRORS.INVALID_SIGNATURE,
