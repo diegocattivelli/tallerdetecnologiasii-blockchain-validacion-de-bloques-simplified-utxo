@@ -42,8 +42,22 @@ export class TransactionValidator {
 
     let totalOutput = 0;
     for (const output of transaction.outputs) {
+      if (output.amount < 0) {
+        errors.push(createValidationError(
+          VALIDATION_ERRORS.NEGATIVE_AMOUNT,
+          `Negative output amount: ${output.amount}`
+        ));
+      } else if (output.amount === 0) {
+        errors.push(createValidationError(
+          VALIDATION_ERRORS.ZERO_AMOUNT,
+          `Zero output amount not allowed`
+        ));
+      }
+
       totalOutput += output.amount;
     }
+
+
 
     if (totalInput !== totalOutput) {
       errors.push(createValidationError(
