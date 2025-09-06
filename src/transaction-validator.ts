@@ -52,6 +52,21 @@ export class TransactionValidator {
       ));
     }
 
+    // Verificación de Firma
+    // Verificar que cada entrada esté firmada por el propietario del UTXO correspondiente
+    const dataToSign = this.createTransactionDataForSigning_(transaction);
+    for (const input of transaction.inputs) {
+      const utxo = this.utxoPool.getUTXO(input.utxoId.txId, input.utxoId.outputIndex);
+      if (utxo) {
+        const isValid = verify(dataToSign, input.signature, input.owner);
+        if (!isValid) {
+          errors.push(createValidationError(
+            VALIDATION_ERRORS.INVALID_SIGNATURE,
+            `Invalid signature for input referencing UTXO ${input.utxoId.txId}:${input.utxoId.outputIndex}`
+          ));
+        }
+      }
+    }
     
     return {
       valid: errors.length === 0,
